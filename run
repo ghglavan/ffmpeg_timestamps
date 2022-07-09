@@ -32,7 +32,11 @@ def run_ffmpeg(video, seconds, save_images=False):
     video_parent = video_origin.parent
 
     if save_images:
-        cmd = cmd + [f"{str(video_parent)}/image_{str(video_name)}%04d.png"]
+        images_dir = video_parent / f"images_{str(video_name)}"
+        if not images_dir.exists():
+            images_dir.mkdir()
+        
+        cmd = cmd + [f"{str(images_dir)}/image_{str(video_name)}%04d.png"]
     else:
         cmd = cmd + [f"{str(video_parent)}/video_{str(video_name)}_timestamps.mp4"]
 
