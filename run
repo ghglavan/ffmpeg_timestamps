@@ -30,9 +30,9 @@ def run_ffmpeg(video, seconds, save_images=False):
     video_origin = os.path.splitext(video)[0]
 
     if save_images:
-        cmd = cmd + [f"{str(video_origin)}_%04d.png"]
+        cmd = cmd + [f"image_{str(video_origin)}_%04d.png"]
     else:
-        cmd = cmd + [f"{str(video_origin)}_timestamps.mp4"]
+        cmd = cmd + [f"video_{str(video_origin)}_timestamps.mp4"]
 
     print(cmd)
     subprocess.run(cmd)
