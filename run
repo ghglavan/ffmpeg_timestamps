@@ -6,8 +6,8 @@ import argparse
 import os
 import subprocess
 
-#VIDS_PATH=Path("/storage/emulated/0/Movies")
-VIDS_PATH=Path(".")
+VIDS_PATH=Path("/storage/emulated/0/Movies")
+#VIDS_PATH=Path(".")
 VIDS_PREFIX="VID_"
 FONT_PATH=Path("./Roboto-Black.ttf")
 
