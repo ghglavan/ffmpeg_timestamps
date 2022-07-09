@@ -6,8 +6,8 @@ import argparse
 import os
 import subprocess
 
-VIDS_PATH=Path("/storage/emulated/0/Movies")
-#VIDS_PATH=Path(".")
+#VIDS_PATH=Path("/storage/emulated/0/Movies")
+VIDS_PATH=Path(".")
 VIDS_PREFIX="VID_"
 FONT_PATH=Path("./Roboto-Black.ttf")
 
@@ -27,12 +27,14 @@ def run_ffmpeg(video, seconds, save_images=False):
     
     cmd = cmd + ["-y", "-i", str(video), "-vf", f"drawtext=\"fontfile={str(FONT_PATH)}:fontsize=60:fontcolor=yellow:text=\'{seconds_text} %{{e\\:t}}\':x=(w-text_w):y=(h-text_h) "]
     
-    video_origin = os.path.splitext(video)[0]
+    video_origin = Path(video)
+    video_name = os.path.splitext(video_origin)[0]
+    video_parent = video_origin.parent
 
     if save_images:
-        cmd = cmd + [f"image_{str(video_origin)}_%04d.png"]
+        cmd = cmd + [f"{str(video_parent)}/image_{str(video_name)}%04d.png"]
     else:
-        cmd = cmd + [f"video_{str(video_origin)}_timestamps.mp4"]
+        cmd = cmd + [f"{str(video_parent)}/video_{str(video_name)}_timestamps.mp4"]
 
     print(cmd)
     subprocess.run(cmd)
