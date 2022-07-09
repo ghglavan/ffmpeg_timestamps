@@ -6,8 +6,8 @@ import argparse
 import os
 import subprocess
 
-VIDS_PATH=Path("/storage/emulated/0/Movies")
-#VIDS_PATH=Path("test")
+#VIDS_PATH=Path("/storage/emulated/0/Movies")
+VIDS_PATH=Path("test")
 VIDS_PREFIX="VID_"
 FONT_PATH=Path("./Roboto-Black.ttf")
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     parser.add_argument("--video", help="The name of the video to write to")
     parser.add_argument("--video-path", help="The path of the video to write to")
     parser.add_argument("--video-nth", type=int, help="The number of the video to write to")
-    parser.add_argument("--save-images", action="store_true", help="Instead of creating a new video, save all images. WARNING: use only with seconds and with a small interval")
+    parser.add_argument("--no-images", action="store_false", help="Dont save images, save an entire video")
     parser.add_argument("--list", action="store_true", help=f"List videos in {VIDS_PATH}")
 
     args = parser.parse_args()
