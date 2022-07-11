@@ -1,0 +1,129 @@
+/*
+   Copyright (c) 2015, Majenko Technologies
+   All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without modification,
+   are permitted provided that the following conditions are met:
+
+ * * Redistributions of source code must retain the above copyright notice, this
+     list of conditions and the following disclaimer.
+
+ * * Redistributions in binary form must reproduce the above copyright notice, this
+     list of conditions and the following disclaimer in the documentation and/or
+     other materials provided with the distribution.
+
+ * * Neither the name of Majenko Technologies nor the names of its
+     contributors may be used to endorse or promote products derived from
+     this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+   ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/* Create a WiFi access point and provide a web server on it. */
+
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <ESP8266WebServer.h>
+
+uint8_t newMACAddress[] = {0x84, 0xF3, 0xEB, 0x0A, 0x21, 0x07};
+
+#ifndef APSSID
+#define APSSID "ESPap"
+#define APPSK  "thereisnospoon"
+#endif
+
+#define AS_AP
+
+/* Set these to your desired credentials. */
+const char *ssid = APSSID;
+const char *password = APPSK;
+
+WiFiServer server(80);
+WiFiClient client;
+bool client_connected = false;
+bool enabled = false;
+bool pin_down = false;
+bool changed = true;
+
+
+void IRAM_ATTR on_pin() {
+  pin_down = true;
+  changed = true;
+}
+
+
+///* Just a little test message.  Go to http://192.168.4.1 in a web browser
+//   connected to this access point to see it.
+//*/
+//void handleRoot() {
+//  String s = String("<h1>You are connected: ") + pin_down ? "true" : "false" + String("</h1>");
+//  server.send(200, "text/html", s.c_str());
+//}
+
+void setup() {
+  delay(1000);
+  Serial.begin(115200);
+
+  pinMode(D5, INPUT_PULLUP);
+  attachInterrupt(D5, on_pin, RISING);
+  
+  Serial.println();
+  Serial.print("Configuring access point...");
+
+
+  WiFi.mode(WIFI_STA);
+  wifi_set_macaddr(STATION_IF, &newMACAddress[0]);
+#ifdef AS_AP
+  IPAddress Ip(192, 168, 0, 101);
+  IPAddress NMask(255, 255, 255, 0);
+  WiFi.softAPConfig(Ip, Ip, NMask);
+  WiFi.mode(WIFI_AP_STA);
+  /* You can remove the password parameter if you want the AP to be open. */
+  WiFi.softAP(ssid, password);
+  IPAddress myIP = WiFi.softAPIP();
+#else
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  IPAddress myIP = WiFi.localIP();
+#endif
+
+  Serial.print("IP address: ");
+  Serial.println(myIP);
+  Serial.print("MAC address: ");
+  Serial.println(WiFi.macAddress());
+  server.begin();
+  Serial.println("HTTP server started");
+}
+
+void loop() {
+  client = server.available();   // listen for incoming clients
+
+  if (client) {                             // if you get a client,
+    Serial.println("New Client.");           // print a message out the serial port
+    String currentLine = "";                // make a String to hold incoming data from the client
+    while (client.connected()) { 
+        Serial.println("Connected.");            
+        Serial.println("sending");
+        if (pin_down) {
+          client.print("asd");
+          pin_down = false;
+        }
+    }
+    client.stop();
+    Serial.println("Client Disconnected.");
+  }
+  delay(100);
+}
